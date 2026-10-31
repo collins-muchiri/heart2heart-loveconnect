@@ -1681,7 +1681,8 @@ footer .field:focus{outline-offset:1px}
     'In-Kind': 'Giving food, clothing, pads or a wheelchair? Tell us in your message — we arrange pickup anywhere in Nakuru.'
   };
   function num(v) { var n = parseInt(v, 10); return isNaN(n) ? 0 : n; }
-  function curAmount() { return other && other.value ? num(other.value) : 5000; }
+  var amount = 5000;
+  function curAmount() { return other && other.value ? num(other.value) : amount; }
   function sum() {
     var a = curAmount();
     if (sumEl) sumEl.textContent = fmt.format(a) + (monthly ? ' monthly' : ', one time') + ' · ' + method + '. Nothing is charged in this prototype.';
@@ -1690,6 +1691,7 @@ footer .field:focus{outline-offset:1px}
   amtBtns.forEach(function (b) {
     b.addEventListener('click', function () {
       amtBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      amount = num(b.getAttribute('data-a'));
       if (other) other.value = '';
       sum();
     });
