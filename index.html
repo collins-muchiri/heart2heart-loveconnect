@@ -449,6 +449,27 @@ footer .field:focus{outline-offset:1px}
 .noscript-note{background:var(--surface-warm);border-bottom:1px solid var(--line);color:var(--ink);
   font-family:'Poppins',sans-serif;font-size:14px;padding:12px 20px;margin:0}
 
+/* Utilities (one-off layout helpers) */
+.sr-defs{position:absolute;width:0;height:0;overflow:hidden}
+.span-full{grid-column:1/-1}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-14{margin-top:14px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}
+.small-note{font-size:12px;color:rgba(255,255,255,.6)}
+.gap-8{display:grid;gap:8px}
+.spacer-12{display:inline-block;width:12px}
+.seg-group{display:flex;gap:8px}
+.muted-ic{color:var(--ink-soft)}
+.anon-ck{width:18px;height:18px;accent-color:var(--primary)}
+.anon-row{margin-top:14px;font-size:13.5px}
+.sum-row{font-weight:600}
+.full-w{width:100%}
+.stack-form{width:100%;margin-top:8px}
+.fcols-socials{justify-content:flex-start}
+.when-line{font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:600;color:var(--primary-deep);margin:0}
+[data-theme="dark"] .when-line{color:var(--primary)}
+.gcal-btn{min-height:40px;padding:8px 16px;font-size:13.5px}
+.data-btn{border-color:var(--line)}
+.grid3{grid-template-columns:1fr 1fr 1fr}
+
 /* Responsive */
 @media(max-width:860px){
   nav#nav{position:absolute;left:0;right:0;top:100%;background:var(--surface-raised);border-bottom:1px solid var(--line);
@@ -489,7 +510,7 @@ footer .field:focus{outline-offset:1px}
 <body>
 <noscript><p class="noscript-note">This prototype works best with JavaScript enabled. All content is readable without it; forms will not submit — please WhatsApp +254723887935 instead.</p></noscript>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<svg width="0" height="0" class="sr-defs" aria-hidden="true" focusable="false">
   <defs>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
@@ -787,21 +808,21 @@ footer .field:focus{outline-offset:1px}
         <div class="grid2">
           <div>
             <label class="sr-only" for="vName">Full name</label>
-            <input class="field" id="vName" name="name" placeholder="Full name *" autocomplete="name">
+            <input class="field" id="vName" type="text" name="name" placeholder="Full name *" autocomplete="name">
           </div>
           <div>
             <label class="sr-only" for="vPhone">Phone number</label>
-            <input class="field" id="vPhone" name="phone" placeholder="Phone (e.g. 0712 345 678) *" inputmode="tel" autocomplete="tel" pattern="^(?:\+?254|0)?[17]\d{8}$" title="Kenyan number, e.g. 0712345678 or +254712345678">
+            <input class="field" id="vPhone" type="tel" name="phone" placeholder="Phone (e.g. 0712 345 678) *" inputmode="tel" autocomplete="tel" pattern="^(?:\+?254|0)?[17]\d{8}$" title="Kenyan number, e.g. 0712345678 or +254712345678">
           </div>
           <div>
             <label class="sr-only" for="vLoc">Location or ward</label>
-            <input class="field" id="vLoc" name="location" placeholder="Location / Ward">
+            <input class="field" id="vLoc" type="text" name="location" placeholder="Location / Ward">
           </div>
           <div>
             <label class="sr-only" for="vSkills">Skills</label>
-            <input class="field" id="vSkills" name="skills" placeholder="Skills (driving, nursing, teaching…)">
+            <input class="field" id="vSkills" type="text" name="skills" placeholder="Skills (driving, nursing, teaching…)">
           </div>
-          <div class="grid2-full" style="grid-column:1/-1">
+          <div class="span-full">
             <label class="sr-only" for="vAvail">Availability</label>
             <select class="field" id="vAvail" name="availability">
               <option value="">Availability…</option>
@@ -813,8 +834,8 @@ footer .field:focus{outline-offset:1px}
           </div>
         </div>
         <p id="volMsg" class="form-msg" aria-live="polite"></p>
-        <button type="submit" class="btn" style="margin-top:16px">Sign Me Up</button>
-        <p class="trust-row" style="margin-top:12px"><span>Saved on this device only — no account needed.</span></p>
+        <button type="submit" class="btn mt-16">Sign Me Up</button>
+        <p class="trust-row mt-12"><span>Saved on this device only — no account needed.</span></p>
       </form>
     </div>
   </section>
@@ -977,8 +998,8 @@ footer .field:focus{outline-offset:1px}
         <button type="button" id="prev" class="icon-btn" aria-label="Previous month"><svg class="ic" aria-hidden="true"><use href="#i-chleft"/></svg></button>
         <h3 id="monthLabel" aria-live="polite">October 2026</h3>
         <button type="button" id="next" class="icon-btn" aria-label="Next month"><svg class="ic" aria-hidden="true"><use href="#i-chright"/></svg></button>
-        <span style="width:12px" aria-hidden="true"></span>
-        <div class="group" role="group" aria-label="Calendar view" style="display:flex;gap:8px">
+        <span class="spacer-12" aria-hidden="true"></span>
+        <div class="seg-group" role="group" aria-label="Calendar view">
           <button type="button" class="chip viewchip" data-v="grid" aria-pressed="true">Calendar</button>
           <button type="button" class="chip viewchip" data-v="list" aria-pressed="false">List</button>
         </div>
@@ -993,7 +1014,7 @@ footer .field:focus{outline-offset:1px}
         </div>
         <div>
           <div id="evList" class="card ev-list" aria-live="polite"></div>
-          <div id="evStatic" class="card ev-static ev-list" style="margin-top:16px">
+          <div id="evStatic" class="card ev-static ev-list mt-16">
             <h3>Upcoming events</h3>
             <ul>
               <li><b>14 January 2026 — Volunteer Appreciation Day</b><br>Afternoon · Nakuru Town, Nakuru County</li>
@@ -1025,7 +1046,7 @@ footer .field:focus{outline-offset:1px}
             <button type="button" class="amt" data-a="20000" aria-pressed="false"><b>KES 20,000</b><span>Wheelchair</span></button>
             <button type="button" class="amt" data-a="50000" aria-pressed="false"><b>KES 50,000</b><span>Shelter Kit</span></button>
           </div>
-          <div style="margin-top:12px">
+          <div class="mt-12">
             <label class="sr-only" for="other">Custom amount in Kenyan shillings</label>
             <input class="field" id="other" type="number" min="1" step="1" inputmode="numeric" placeholder="…or enter a custom amount (KES)">
           </div>
@@ -1039,31 +1060,31 @@ footer .field:focus{outline-offset:1px}
           </div>
           <p id="payHelp">M-Pesa Paybill details are shared instantly on WhatsApp after you tap Donate — or message us first at <b>+254723887935</b>.</p>
 
-          <label class="switch-row" for="monthly">
+          <label class="switch-row">
             <button type="button" id="monthly" class="switch" role="switch" aria-checked="false" aria-label="Make it monthly"></button>
-            Make it monthly <svg class="ic" aria-hidden="true" style="color:var(--ink-soft)"><use href="#i-clock"/></svg>
+            Make it monthly <svg class="ic muted-ic" aria-hidden="true"><use href="#i-clock"/></svg>
           </label>
 
           <h3 class="step-h">3 · Your details</h3>
-          <div class="grid2" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="grid2 grid3">
             <div>
               <label class="sr-only" for="dName">Full name</label>
-              <input class="field" id="dName" placeholder="Full name *" autocomplete="name">
+              <input class="field" id="dName" type="text" placeholder="Full name *" autocomplete="name">
             </div>
             <div>
               <label class="sr-only" for="dPhone">Phone or WhatsApp number</label>
-              <input class="field" id="dPhone" placeholder="Phone / WhatsApp *" inputmode="tel" autocomplete="tel">
+              <input class="field" id="dPhone" type="tel" placeholder="Phone / WhatsApp *" inputmode="tel" autocomplete="tel">
             </div>
             <div>
               <label class="sr-only" for="dEmail">Email address</label>
               <input class="field" id="dEmail" type="email" placeholder="Email (optional)" autocomplete="email">
             </div>
           </div>
-          <label class="switch-row" style="margin-top:14px;font-size:13.5px">
-            <input type="checkbox" id="anon" style="width:18px;height:18px;accent-color:var(--primary)"> Give anonymously — appear as “Anonymous Friend” on the wall
+          <label class="switch-row anon-row">
+            <input type="checkbox" id="anon" class="anon-ck"> Give anonymously — appear as “Anonymous Friend” on the wall
           </label>
           <p id="donErr" class="form-msg err" role="alert" tabindex="-1"></p>
-          <p id="sum" class="form-msg" aria-live="polite" style="font-weight:600"></p>
+          <p id="sum" class="form-msg sum-row" aria-live="polite"></p>
           <button type="submit" id="giveBtn" class="btn give-btn"><svg class="ic" aria-hidden="true"><use href="#i-handheart"/></svg> Donate KES 5,000</button>
           <p class="trust-row">
             <span><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg> Nothing is charged in this prototype</span>
@@ -1078,12 +1099,12 @@ footer .field:focus{outline-offset:1px}
             <div class="bar"><span id="goalBar"></span></div>
             <p id="goalLine">KES 0 raised of KES 500,000 — wheelchairs, dignity packs, food parcels and Shelter Home #03.</p>
           </div>
-          <div class="card wall-card" style="margin-top:20px">
+          <div class="card wall-card mt-20">
             <h3>Donor Wall of Hearts</h3>
             <p class="wall-empty" id="wallEmpty">Be the first heart on this wall — your name appears here after you give.</p>
             <ul id="wallList"></ul>
           </div>
-          <div class="card trusted" style="margin-top:20px">
+          <div class="card trusted mt-20">
             <h3>Trusted With</h3>
             <div class="tag-row">
               <span>Rani Ramchandani Foundation</span>
@@ -1099,8 +1120,8 @@ footer .field:focus{outline-offset:1px}
               <p>This prototype stores your form entries in your browser only (names, phone numbers and amounts you type). Nothing is sent to a server, and payments are simulated — nothing is ever charged.</p>
               <p id="storageWarn" class="storage-warn" hidden>Saving is unavailable in this browser session (private mode or storage disabled) — entries stay on screen only.</p>
               <div class="data-actions">
-                <button type="button" id="exportData" class="btn ghost" style="border-color:var(--line)"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg> Download my records</button>
-                <button type="button" id="clearData" class="btn ghost" style="border-color:var(--line)"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg> Erase device data</button>
+                <button type="button" id="exportData" class="btn ghost data-btn"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg> Download my records</button>
+                <button type="button" id="clearData" class="btn ghost data-btn"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg> Erase device data</button>
               </div>
             </div>
           </details>
@@ -1124,7 +1145,7 @@ footer .field:focus{outline-offset:1px}
           Heart2Heart
         </p>
         <p>Heart 2 Heart &amp; Love and Connect Foundation — Connecting Hearts with Love and Care. Founded by Amos Bett, serving Kuresoi North, Rongai and Nakuru town.</p>
-        <div class="socials" style="justify-content:flex-start">
+        <div class="socials fcols-socials">
           <a class="soc" href="https://facebook.com/Amosbett35" rel="noopener" aria-label="Facebook — @Amosbett35">f</a>
           <a class="soc" href="https://instagram.com/Amosbett35" rel="noopener" aria-label="Instagram — @Amosbett35">◎</a>
           <a class="soc" href="https://x.com/Amosbett35" rel="noopener" aria-label="X — @Amosbett35">𝕏</a>
@@ -1145,7 +1166,7 @@ footer .field:focus{outline-offset:1px}
           <li><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg>
             <span class="copyrow"><a href="mailto:info@heart2heart-loveconnect.org">info@heart2heart-loveconnect.org</a>
             <button type="button" class="cbtn" data-copy="info@heart2heart-loveconnect.org" aria-label="Copy email address"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Copy</button></span>
-            <span style="font-size:12px;color:rgba(255,255,255,.6)"> (placeholder address)</span>
+            <span class="small-note"> (placeholder address)</span>
           </li>
           <li><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> Mon–Fri 9:00–17:00 EAT</li>
         </ul>
@@ -1165,15 +1186,15 @@ footer .field:focus{outline-offset:1px}
       <div>
         <h4>Write to Us</h4>
         <form id="cForm" novalidate>
-          <div style="display:grid;gap:8px">
+          <div class="gap-8">
             <label class="sr-only" for="cName">Your name</label>
-            <input class="field" id="cName" placeholder="Your name" autocomplete="name">
+            <input class="field" id="cName" type="text" placeholder="Your name" autocomplete="name">
             <label class="sr-only" for="cEmail">Your email</label>
             <input class="field" id="cEmail" type="email" placeholder="Your email" autocomplete="email">
             <label class="sr-only" for="cMsgIn">Your message</label>
             <textarea class="field" id="cMsgIn" rows="3" placeholder="How can we connect hearts together?"></textarea>
           </div>
-          <button type="submit" class="btn" style="width:100%;margin-top:8px">Send Message</button>
+          <button type="submit" class="btn stack-form">Send Message</button>
           <p id="cMsg" class="form-msg" aria-live="polite"></p>
         </form>
       </div>
@@ -1202,26 +1223,26 @@ footer .field:focus{outline-offset:1px}
     <div class="mbody">
       <div class="mhead">
         <div>
-          <p class="when" id="evWhen" style="font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:600;color:var(--primary-deep);margin:0"></p>
-          <h3 id="evTitle"></h3>
+          <p class="when-line" id="evWhen"></p>
+          <h3 id="evTitle">Event details</h3>
         </div>
         <button type="button" class="icon-btn mclose" data-close="evModal" aria-label="Close event details"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
       </div>
       <p class="desc" id="evDesc"></p>
       <p class="mloc"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg> <span id="evLoc"></span> — call +254723887935 for directions.</p>
-      <p class="gcal"><a class="btn ghost" id="evCal" href="https://calendar.google.com" rel="noopener" style="min-height:40px;padding:8px 16px;font-size:13.5px"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg> Add to Google Calendar</a></p>
+      <p class="gcal"><a class="btn ghost gcal-btn" id="evCal" href="https://calendar.google.com" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg> Add to Google Calendar</a></p>
       <form id="rsvpForm" class="rsvp" novalidate>
         <h4>RSVP — save my seat</h4>
         <div class="grid2">
           <div>
             <label class="sr-only" for="rName">Your name</label>
-            <input class="field" id="rName" placeholder="Name *" autocomplete="name">
+            <input class="field" id="rName" type="text" placeholder="Name *" autocomplete="name">
           </div>
           <div>
             <label class="sr-only" for="rPhone">Phone number</label>
-            <input class="field" id="rPhone" placeholder="Phone *" inputmode="tel" autocomplete="tel">
+            <input class="field" id="rPhone" type="tel" placeholder="Phone *" inputmode="tel" autocomplete="tel">
           </div>
-          <div style="grid-column:1/-1">
+          <div class="span-full">
             <label class="sr-only" for="rGuests">Number of guests</label>
             <select class="field" id="rGuests">
               <option value="1">1 guest (including me)</option>
@@ -1233,7 +1254,7 @@ footer .field:focus{outline-offset:1px}
           </div>
         </div>
         <p id="rsvpMsg" class="form-msg" aria-live="polite"></p>
-        <button type="submit" id="rsvpBtn" class="btn" style="width:100%;margin-top:12px">Confirm RSVP</button>
+        <button type="submit" id="rsvpBtn" class="btn full-w mt-12">Confirm RSVP</button>
       </form>
     </div>
   </div>
@@ -1245,7 +1266,7 @@ footer .field:focus{outline-offset:1px}
     <h3 id="thanksTitle">Thank You!</h3>
     <p id="thanksLine">Your generosity is recorded on our Donor Wall of Hearts.</p>
     <p class="fine">Nothing has been charged — this is a prototype, and your entry is saved on this device only. You will receive a photo receipt on WhatsApp within 7 days once giving goes live.</p>
-    <button type="button" class="btn" data-close="thanksModal" style="width:100%;margin-top:16px">Asante Sana — Close</button>
+    <button type="button" class="btn full-w mt-16" data-close="thanksModal">Asante Sana — Close</button>
   </div>
 </div>
 
