@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 ## [Unreleased]
 
+### Changed
+
+- CI: the release workflow no longer redeploys Pages. Pages deploys from `main` via `pages.yml`, and release tags are always cut from `main` HEAD, so the redundant job only caused deployment races (and false release failures).
+
 ## [0.1.1] - 2026-10-31
 
 ### Fixed

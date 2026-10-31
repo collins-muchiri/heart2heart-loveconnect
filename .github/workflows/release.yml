@@ -2,13 +2,14 @@
 #
 # Tag naming drives the release channel:
 #   v1.2.3        -> FULL RELEASE: published to GitHub Releases and marked
-#                    "latest"; the exact tagged code is then redeployed to
-#                    GitHub Pages by the "pages" job below.
+#                    "latest". Pages is NOT redeployed here: pages.yml
+#                    already deploys every commit on main, and bump.mjs
+#                    always cuts tags from main HEAD, so the tagged code
+#                    and the live site are identical by construction.
 #   v1.2.3-rc.1   -> PRE-RELEASE: any tag containing "-" (e.g. release
 #                    candidates like v1.0.0-rc.1) is published as a GitHub
-#                    pre-release, never marked "latest", and Pages is left
-#                    untouched. The live site therefore only ever serves a
-#                    stable full release.
+#                    pre-release, never marked "latest". The live site
+#                    therefore only ever serves a stable full release.
 #
 # NOTE: `make_latest` on softprops/action-gh-release@v2 must be the STRING
 # "true" or "false", not a boolean expression, so both channel flags are
@@ -23,8 +24,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   release:
@@ -76,35 +75,3 @@ jobs:
           body_path: notes.md
           prerelease: ${{ env.PRERELEASE }}
           make_latest: ${{ env.MAKE_LATEST }}
-
-  # Redeploy Pages only for full releases: pre-release tags (containing "-")
-  # must never overwrite the live site.
-  pages:
-    name: Redeploy GitHub Pages from the release tag
-    needs: release
-    if: ${{ !contains(github.ref_name, '-') }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    # Shares the "pages" group with pages.yml so a full-release deployment
-    # supersedes any in-flight main-branch deployment.
-    concurrency:
-      group: pages
-      cancel-in-progress: true
-    steps:
-      - name: Checkout repository (at the release tag)
-        uses: actions/checkout@v4
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "."
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
