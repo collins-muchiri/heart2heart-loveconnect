@@ -94,6 +94,7 @@ a{color:var(--primary-deep)}
   padding:12px 22px;border-radius:999px;border:2px solid var(--primary);background:var(--primary);
   color:#fff;text-decoration:none;font-size:15px;transition:transform .15s ease,filter .15s ease}
 .btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+a.btn,a.btn:visited{color:#fff}
 .btn:active{transform:translateY(0)}
 .btn.ghost{background:transparent;color:inherit;border-color:currentColor}
 .btn.green{background:var(--green);border-color:var(--green);color:#fff}
@@ -292,10 +293,10 @@ details.story[open] .readmore .less{display:inline}
 .cal-toolbar h3{font-size:20px;font-weight:700;min-width:190px;text-align:center}
 .cal-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start}
 .cal-card{padding:20px}
-.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;font-family:'Poppins',sans-serif;font-size:11px;
+.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;font-family:'Poppins',sans-serif;font-size:11px;
   font-weight:700;text-align:center;color:var(--ink-soft);margin-bottom:8px}
 .dow span{padding:4px 0}
-#days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+#days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .day{aspect-ratio:1/1;border-radius:12px;border:2px solid transparent;background:transparent;
   font-family:'Poppins',sans-serif;font-size:14px;color:var(--ink-soft);cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;position:relative}
