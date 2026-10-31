@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-31
+
 ### Fixed
 
 - Replaced every em dash and spaced en dash across the page copy with natural punctuation (commas, colons and full stops), and switched calendar date ranges to plain "to" phrasing. No wording or meaning changed.

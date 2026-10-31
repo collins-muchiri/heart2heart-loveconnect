@@ -1,6 +1,6 @@
 {
   "name": "heart2heart-loveconnect",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Single-file website prototype for Heart 2 Heart & Love Connect Foundation (Nakuru, Kenya) — no runtime dependencies, release-ready repository.",
   "scripts": {
