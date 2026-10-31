@@ -1249,6 +1249,719 @@ footer .field:focus{outline-offset:1px}
   </div>
 </div>
 
-<!-- SCRIPT -->
+<script>
+(function () {
+  'use strict';
+  var d = document;
+  function $(s, c) { return (c || d).querySelector(s); }
+  function $$(s, c) { return Array.prototype.slice.call((c || d).querySelectorAll(s)); }
+
+  window.H2H = { version: '0.1.0' };
+
+  /* ---------- Safe storage (h2h.v1.* namespace, try/catch everywhere) ---------- */
+  var KEYS = {
+    gifts: 'h2h.v1.gifts',
+    volunteers: 'h2h.v1.volunteers',
+    messages: 'h2h.v1.messages',
+    rsvp: 'h2h.v1.rsvp',
+    newsletter: 'h2h.v1.newsletter',
+    theme: 'h2h.v1.theme',
+    banner: 'h2h.v1.banner'
+  };
+  var mem = {};
+  var storageOk = true;
+  function sget(k) {
+    try {
+      var raw = localStorage.getItem(k);
+      return raw === null ? (k in mem ? mem[k] : null) : JSON.parse(raw);
+    } catch (e) { storageOk = false; return k in mem ? mem[k] : null; }
+  }
+  function sset(k, v) {
+    try { localStorage.setItem(k, JSON.stringify(v)); }
+    catch (e) { storageOk = false; mem[k] = v; }
+  }
+  function sdel(k) {
+    try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
+    delete mem[k];
+  }
+
+  var live = $('#live');
+  function announce(msg) {
+    if (!live) return;
+    live.textContent = '';
+    window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fmt = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', currencyDisplay: 'code', maximumFractionDigits: 0 });
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function fmtDate(k) {
+    if (!k) return '';
+    var p = k.split('-');
+    return parseInt(p[2], 10) + ' ' + MONTHS[parseInt(p[1], 10) - 1] + ' ' + p[0];
+  }
+
+  /* ---------- Theme toggle ---------- */
+  var root = d.documentElement;
+  var themeBtn = $('#themeBtn');
+  var metaTheme = $('#metaTheme');
+  function applyTheme(t, persist) {
+    root.setAttribute('data-theme', t);
+    if (metaTheme) metaTheme.setAttribute('content', t === 'dark' ? '#1D150F' : '#FFF8F0');
+    if (themeBtn) {
+      themeBtn.setAttribute('aria-pressed', String(t === 'dark'));
+      themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    if (persist) sset(KEYS.theme, t);
+  }
+  applyTheme(root.getAttribute('data-theme') || 'light', false);
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next, true);
+      announce('Switched to ' + next + ' theme.');
+    });
+  }
+  try {
+    if (!localStorage.getItem(KEYS.theme) && window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      var onScheme = function (e) { applyTheme(e.matches ? 'dark' : 'light', false); };
+      if (mq.addEventListener) mq.addEventListener('change', onScheme);
+      else if (mq.addListener) mq.addListener(onScheme);
+    }
+  } catch (e) { /* storage unavailable */ }
+
+  /* ---------- Disclaimer banner ---------- */
+  var banner = $('#disclaimer');
+  var bannerClose = $('#bannerClose');
+  if (banner && sget(KEYS.banner) === 'dismissed') banner.hidden = true;
+  if (banner && bannerClose) {
+    bannerClose.addEventListener('click', function () {
+      banner.hidden = true;
+      sset(KEYS.banner, 'dismissed');
+      announce('Prototype notice dismissed.');
+    });
+  }
+
+  /* ---------- Mobile menu ---------- */
+  var menuBtn = $('#menuBtn');
+  var nav = $('#nav');
+  function setMenu(open) {
+    if (!menuBtn || !nav) return;
+    nav.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  }
+  if (menuBtn && nav) {
+    menuBtn.addEventListener('click', function () {
+      setMenu(!nav.classList.contains('open'));
+    });
+    nav.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('a')) setMenu(false);
+    });
+    d.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        setMenu(false);
+        menuBtn.focus();
+      }
+    });
+  }
+
+  /* ---------- Brand button scrolls home ---------- */
+  $$('.brand[data-goto]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = $(b.getAttribute('data-goto').charAt(0) === '#' ? b.getAttribute('data-goto') : '#' + b.getAttribute('data-goto'));
+      if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+
+  /* ---------- Impact counters ---------- */
+  $$('.count').forEach(function (el) {
+    var target = parseInt(el.getAttribute('data-v'), 10) || 0;
+    var suf = el.getAttribute('data-suf') || '';
+    if (reduce || !('IntersectionObserver' in window)) {
+      el.textContent = target.toLocaleString() + suf;
+      return;
+    }
+    el.textContent = '0' + suf;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        io.disconnect();
+        var t0 = performance.now();
+        var tick = function (t) {
+          var p = Math.min(1, (t - t0) / 1400);
+          el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString() + suf;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.4 });
+    io.observe(el);
+  });
+
+  /* ---------- Stories filter + search ---------- */
+  var posts = $('#posts');
+  var fchips = $$('.fchip');
+  var storyCount = $('#storyCount');
+  var storySearch = $('#storySearch');
+  function applyFilter() {
+    if (!posts) return;
+    var f = posts.getAttribute('data-f') || 'all';
+    var q = storySearch && storySearch.value ? storySearch.value.toLowerCase() : '';
+    var shown = 0;
+    var all = $$('.post', posts);
+    all.forEach(function (p) {
+      var okc = f === 'all' || p.getAttribute('data-c') === f;
+      var okq = !q || (p.textContent || '').toLowerCase().indexOf(q) > -1;
+      var vis = okc && okq;
+      if (vis) { p.removeAttribute('hidden'); shown++; } else { p.hidden = true; }
+    });
+    if (storyCount) storyCount.textContent = 'Showing ' + shown + ' of ' + all.length + ' stories';
+  }
+  fchips.forEach(function (ch) {
+    ch.addEventListener('click', function () {
+      fchips.forEach(function (c) { c.setAttribute('aria-pressed', String(c === ch)); });
+      if (posts) posts.setAttribute('data-f', ch.getAttribute('data-f') || 'all');
+      applyFilter();
+      announce('Stories filtered. ' + (storyCount ? storyCount.textContent : ''));
+    });
+  });
+  if (storySearch) storySearch.addEventListener('input', applyFilter);
+  applyFilter();
+
+  /* ---------- Events calendar ---------- */
+  var EV = [
+    { d: '2026-01-14', t: 'Volunteer Appreciation Day', time: '14:00 to 17:00', place: 'Nakuru Town, Nakuru County', type: 'Community', img: 'assets/img/hero-community-hands.jpg', alt: 'Volunteers at sunset', desc: 'A thank-you gathering for the hands and hearts behind every delivery and build.' },
+    { d: '2026-05-03', t: 'Kuresoi North Wheelchair Distribution Drive', time: '09:00 to 15:00', place: 'Kapkures Village, Kamara Ward, Kuresoi North', type: 'Drive', img: 'assets/img/kapkures-mobility.jpg', alt: 'Wheelchair distribution at Kapkures', desc: 'Fitting and handing over wheelchairs with the Rani Ramchandani Foundation.' },
+    { d: '2026-05-13', t: 'Shelter Anniversary Build Camp', time: '08:00 to 16:00', place: 'Nakuru, Nakuru County', type: 'Volunteering', img: 'assets/img/shelter-kipkemoi.jpg', alt: 'Shelter build camp', desc: 'Celebrating the Shelter For Needy Family Initiative with a community build camp.' },
+    { d: '2026-10-11', t: 'International Day of the Girl Child', time: '10:00 to 13:00', place: 'Nakuru schools, Nakuru County', type: 'Mentorship', img: 'assets/img/dignity-girlchild.jpg', alt: 'Girl dignity campaign', desc: 'Pad distribution and mentorship for girls, with our male-allies dignity campaign.' },
+    { d: '2026-11-08', t: 'Rongai Outreach — Moricho', time: '09:00 to 14:00', place: 'Moricho Sublocation, Rongai, Nakuru', type: 'Outreach', img: 'assets/img/moricho-elderly.jpg', alt: 'Moricho outreach, Rongai', desc: 'Home visits, wheelchair follow-up and food support in Moricho Sublocation.' },
+    { d: '2026-12-24', end: '2026-12-31', t: 'Christmas & New Year Feast', time: '12:00 to 16:00', place: 'Rural Nakuru County', type: 'Community', img: 'assets/img/elderly-care.jpg', alt: 'Community feast outreach', desc: 'A week of shared meals with elderly neighbours, orphans and needy families.' }
+  ];
+  var daysEl = $('#days');
+  var monthLabel = $('#monthLabel');
+  var evList = $('#evList');
+  var evStatic = $('#evStatic');
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  var view = today.getFullYear() === 2026
+    ? new Date(today.getFullYear(), today.getMonth(), 1)
+    : new Date(2026, 9, 1);
+  var sel = null;
+  function key(y, m, dd) {
+    return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+  }
+  function evOn(k) {
+    return EV.filter(function (e) { return e.d === k || (e.end && k >= e.d && k <= e.end); });
+  }
+  function drawCal() {
+    if (!daysEl) return;
+    var y = view.getFullYear();
+    var m = view.getMonth();
+    if (monthLabel) monthLabel.textContent = MONTHS[m] + ' ' + y;
+    var first = (new Date(y, m, 1).getDay() + 6) % 7;
+    var dim = new Date(y, m + 1, 0).getDate();
+    var tk = key(today.getFullYear(), today.getMonth(), today.getDate());
+    var html = '';
+    for (var i = 0; i < first; i++) html += '<span aria-hidden="true"></span>';
+    for (var dd = 1; dd <= dim; dd++) {
+      var k = key(y, m, dd);
+      var evs = evOn(k);
+      var cls = 'day' + (evs.length ? ' has' : '') + (k === sel ? ' sel' : '') + (k === tk ? ' today' : '');
+      var lbl = dd + ' ' + MONTHS[m] + ' ' + y +
+        (evs.length ? ', ' + evs.length + ' event' + (evs.length > 1 ? 's' : '') : '') +
+        (k === tk ? ', today' : '');
+      html += '<button type="button" class="' + cls + '" data-k="' + k + '" aria-label="' + lbl + '" aria-pressed="' + (k === sel) + '">' +
+        dd + (evs.length ? '<span class="dot" aria-hidden="true"></span>' : '') + '</button>';
+    }
+    daysEl.innerHTML = html;
+  }
+  function evHtml(e) {
+    var when = fmtDate(e.d) + (e.end ? ' – ' + fmtDate(e.end) : '') + ' · ' + (e.time || 'Time to confirm');
+    return '<div class="ev-item"><div class="when">' + when + '</div><b>' + e.t + '</b>' +
+      '<span>' + e.place + ' · ' + e.type + '</span>' +
+      '<div class="ev-actions"><button type="button" class="btn" data-ev="' + e.d + '|' + e.t + '">Details &amp; RSVP</button>' +
+      '<a class="btn ghost" href="#volunteer">Volunteer</a></div></div>';
+  }
+  function drawEv() {
+    if (!evList) return;
+    if (evStatic) evStatic.hidden = true;
+    if (sel) {
+      var evs = evOn(sel);
+      if (!evs.length) {
+        evList.innerHTML = '<h3>Nothing planned on this day yet</h3>' +
+          '<p>Have an idea for this date? Suggest it on WhatsApp <a href="https://wa.me/254723887935" rel="noopener">+254 723 887 935</a>.</p>';
+      } else {
+        evList.innerHTML = '<h3>' + fmtDate(sel) + '</h3>' + evs.map(evHtml).join('');
+      }
+    } else {
+      var tk = key(today.getFullYear(), today.getMonth(), today.getDate());
+      var up = EV.filter(function (e) { return e.d >= tk || (e.end && e.end >= tk); });
+      evList.innerHTML = '<h3>Upcoming events</h3>' +
+        (up.length ? up.map(evHtml).join('') : '<p>2026 dates are being confirmed — check back soon.</p>');
+    }
+    $$('[data-ev]', evList).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.getAttribute('data-ev').split('|');
+        var found = null;
+        for (var i = 0; i < EV.length; i++) {
+          if (EV[i].d === parts[0] && EV[i].t === parts.slice(1).join('|')) { found = EV[i]; break; }
+        }
+        if (found) openEvent(found);
+      });
+    });
+  }
+  $('#prev') && $('#prev').addEventListener('click', function () {
+    view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+    drawCal(); bindDays(); drawEv();
+  });
+  $('#next') && $('#next').addEventListener('click', function () {
+    view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+    drawCal(); bindDays(); drawEv();
+  });
+  function bindDays() {
+    if (!daysEl) return;
+    $$('button.day', daysEl).forEach(function (b) {
+      b.addEventListener('click', function () {
+        sel = b.getAttribute('data-k');
+        drawCal();
+        bindDays();
+        drawEv();
+        var evs = evOn(sel);
+        if (evs.length) openEvent(evs[0]);
+      });
+    });
+  }
+  $$('.viewchip').forEach(function (vc) {
+    vc.addEventListener('click', function () {
+      $$('.viewchip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === vc)); });
+      var list = vc.getAttribute('data-v') === 'list';
+      if (daysEl) $('#cal').hidden = list;
+      if (list) { sel = null; drawCal(); }
+      drawEv();
+    });
+  });
+
+  /* ---------- Modals ---------- */
+  var lastFocus = null;
+  function openModal(el) {
+    if (!el) return;
+    el.hidden = false;
+    d.body.style.overflow = 'hidden';
+    var f = $('button, [href], input, select, textarea', el);
+    if (f) f.focus();
+  }
+  function closeModal(el) {
+    if (!el) return;
+    el.hidden = true;
+    d.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $$('.modal').forEach(function (m) {
+    m.addEventListener('click', function (e) { if (e.target === m) closeModal(m); });
+  });
+  $$('[data-close]').forEach(function (b) {
+    b.addEventListener('click', function () { closeModal($('#' + b.getAttribute('data-close'))); });
+  });
+  d.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      $$('.modal').forEach(function (m) { if (!m.hidden) closeModal(m); });
+    }
+  });
+
+  /* ---------- RSVP ---------- */
+  var curEv = null;
+  var rsvpForm = $('#rsvpForm');
+  var rsvpMsg = $('#rsvpMsg');
+  var rsvpBtn = $('#rsvpBtn');
+  function isRsvped(e) {
+    var arr = sget(KEYS.rsvp) || [];
+    return arr.some(function (r) { return r.eventDate === e.d && r.title === e.t; });
+  }
+  function setRsvpDone(done) {
+    if (rsvpBtn) {
+      rsvpBtn.disabled = done;
+      rsvpBtn.textContent = done ? 'Noted, thank you' : 'Confirm RSVP';
+    }
+  }
+  function openEvent(e) {
+    curEv = e;
+    lastFocus = d.activeElement;
+    var evImg = $('#evImg');
+    if (evImg) { evImg.src = e.img; evImg.alt = e.alt; }
+    var t = $('#evTitle'); if (t) t.textContent = e.t;
+    var w = $('#evWhen');
+    if (w) w.textContent = fmtDate(e.d) + (e.end ? ' – ' + fmtDate(e.end) : '') + ' · ' + (e.time || 'Time to confirm');
+    var de = $('#evDesc'); if (de) de.textContent = e.desc;
+    var lo = $('#evLoc'); if (lo) lo.textContent = e.place;
+    var cal = $('#evCal');
+    if (cal) {
+      var gd = function (k) { return k.replace(/-/g, ''); };
+      cal.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(e.t) +
+        '&dates=' + gd(e.d) + 'T090000/' + gd(e.end || e.d) + 'T120000' +
+        '&details=' + encodeURIComponent(e.desc) + '&location=' + encodeURIComponent(e.place);
+    }
+    setRsvpDone(isRsvped(e));
+    if (rsvpMsg) { rsvpMsg.textContent = ''; rsvpMsg.className = 'form-msg'; }
+    var rf = $('#rsvpForm');
+    if (rf) rf.reset();
+    openModal($('#evModal'));
+  }
+  if (rsvpForm) {
+    rsvpForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (!curEv) return;
+      var n = ($('#rName') && $('#rName').value || '').trim();
+      var p = ($('#rPhone') && $('#rPhone').value || '').trim();
+      var clean = p.replace(/[\s-]/g, '');
+      if (!n || !clean) {
+        if (rsvpMsg) { rsvpMsg.textContent = 'Please add your name and phone number.'; rsvpMsg.className = 'form-msg err'; }
+        (n ? $('#rPhone') : $('#rName')).focus();
+        return;
+      }
+      if (!/^(?:\+?254|0)?[17]\d{8}$/.test(clean)) {
+        if (rsvpMsg) { rsvpMsg.textContent = 'Please use a Kenyan number, e.g. 0712345678 or +254712345678.'; rsvpMsg.className = 'form-msg err'; }
+        $('#rPhone').focus();
+        return;
+      }
+      var arr = sget(KEYS.rsvp) || [];
+      arr.push({
+        id: 'rsvp-' + Date.now(), ts: new Date().toISOString(), source: 'prototype',
+        eventDate: curEv.d, title: curEv.t, name: n, phone: clean,
+        guests: $('#rGuests') ? $('#rGuests').value : '1'
+      });
+      sset(KEYS.rsvp, arr);
+      setRsvpDone(true);
+      if (rsvpMsg) {
+        rsvpMsg.textContent = 'Confirmed! ' + n.split(' ')[0] + ', you are on the list for ' + curEv.t + '. We will confirm by phone before the day.';
+        rsvpMsg.className = 'form-msg ok';
+      }
+      announce('RSVP saved for ' + curEv.t + '.');
+    });
+  }
+
+  /* ---------- Donation portal ---------- */
+  var GOAL = 500000;
+  var amtBtns = $$('.amt');
+  var other = $('#other');
+  var sumEl = $('#sum');
+  var giveBtn = $('#giveBtn');
+  var payBtns = $$('.pay');
+  var payHelp = $('#payHelp');
+  var monthlyBtn = $('#monthly');
+  var donErr = $('#donErr');
+  var monthly = false;
+  var method = 'M-Pesa Paybill';
+  var HELP = {
+    'M-Pesa Paybill': 'M-Pesa Paybill details are shared instantly on WhatsApp after you tap Donate — or message us first at +254723887935.',
+    'Bank Transfer': 'Bank account details are sent with your confirmation message. Reference your gift "Heart2Heart + your name".',
+    'PayPal': 'A PayPal payment link is sent to your email or WhatsApp after you tap Donate.',
+    'In-Kind': 'Giving food, clothing, pads or a wheelchair? Tell us in your message — we arrange pickup anywhere in Nakuru.'
+  };
+  function num(v) { var n = parseInt(v, 10); return isNaN(n) ? 0 : n; }
+  function curAmount() { return other && other.value ? num(other.value) : 5000; }
+  function sum() {
+    var a = curAmount();
+    if (sumEl) sumEl.textContent = fmt.format(a) + (monthly ? ' monthly' : ', one time') + ' · ' + method + '. Nothing is charged in this prototype.';
+    if (giveBtn) giveBtn.textContent = 'Donate ' + fmt.format(a) + (monthly ? ' / month' : '');
+  }
+  amtBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      amtBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      if (other) other.value = '';
+      sum();
+    });
+  });
+  if (other) {
+    other.addEventListener('input', function () {
+      amtBtns.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+      sum();
+    });
+  }
+  payBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      payBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      method = b.getAttribute('data-m');
+      if (payHelp) payHelp.textContent = HELP[method];
+      sum();
+    });
+  });
+  if (monthlyBtn) {
+    monthlyBtn.addEventListener('click', function () {
+      monthly = monthlyBtn.getAttribute('aria-checked') === 'true';
+      monthly = !monthly;
+      monthlyBtn.setAttribute('aria-checked', String(monthly));
+      sum();
+    });
+  }
+  function showDonErr(msg) {
+    if (donErr) { donErr.textContent = msg; }
+    if (donErr) donErr.focus();
+  }
+  function refreshWall() {
+    var arr = sget(KEYS.gifts) || [];
+    var raised = arr.reduce(function (s, g) { return s + (g.amount || 0); }, 0);
+    var pct = Math.min(100, Math.round((raised / GOAL) * 100));
+    var bar = $('#goalBar'); if (bar) bar.style.width = Math.max(pct, 2) + '%';
+    var pctEl = $('#goalPct'); if (pctEl) pctEl.textContent = pct + '%';
+    var line = $('#goalLine');
+    if (line) line.textContent = fmt.format(raised) + ' raised of ' + fmt.format(GOAL) + ' — wheelchairs, dignity packs, food parcels and Shelter Home #03.';
+    var list = $('#wallList');
+    var empty = $('#wallEmpty');
+    if (list && empty) {
+      list.textContent = '';
+      var rows = arr.slice(-12).reverse();
+      empty.hidden = rows.length > 0;
+      rows.forEach(function (g) {
+        var li = d.createElement('li');
+        var ic = d.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        ic.setAttribute('class', 'ic'); ic.setAttribute('aria-hidden', 'true');
+        var use = d.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', '#i-heart');
+        ic.appendChild(use);
+        var nm = d.createElement('b');
+        nm.textContent = g.anonymous ? 'Anonymous Friend' : g.name;
+        var amt = d.createElement('em');
+        amt.textContent = '· ' + fmt.format(g.amount) + (g.monthly ? ' /mo' : '');
+        li.appendChild(ic); li.appendChild(nm); li.appendChild(amt);
+        list.appendChild(li);
+      });
+    }
+  }
+  var donForm = $('#donForm');
+  if (donForm) {
+    donForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var a = curAmount();
+      if (a <= 0) { showDonErr('Please choose or enter an amount greater than zero.'); return; }
+      var n = ($('#dName') && $('#dName').value || '').trim();
+      var p = ($('#dPhone') && $('#dPhone').value || '').trim();
+      if (!n || !p) { showDonErr('Please add your name and phone so we can send your photo receipt.'); return; }
+      var gift = {
+        id: 'gift-' + Date.now(), ts: new Date().toISOString(), source: 'prototype',
+        name: n, phone: p.replace(/[\s-]/g, ''),
+        email: ($('#dEmail') && $('#dEmail').value || '').trim(),
+        amount: a, method: method, monthly: monthly,
+        anonymous: !!(($('#anon') && $('#anon').checked))
+      };
+      var arr = sget(KEYS.gifts) || [];
+      arr.push(gift);
+      sset(KEYS.gifts, arr);
+      refreshWall();
+      var tl = $('#thanksLine');
+      if (tl) tl.textContent = 'Thank you, ' + n.split(' ')[0] + '. Your gift of ' + fmt.format(a) + (monthly ? ' monthly' : '') + ' via ' + method + ' is recorded on our Donor Wall of Hearts.';
+      lastFocus = d.activeElement;
+      if ($('#dName')) $('#dName').value = '';
+      if ($('#dPhone')) $('#dPhone').value = '';
+      if ($('#dEmail')) $('#dEmail').value = '';
+      if ($('#anon')) $('#anon').checked = false;
+      openModal($('#thanksModal'));
+      announce('Thank you — gift of ' + fmt.format(a) + ' recorded on this device.');
+    });
+  }
+
+  /* ---------- Volunteer form ---------- */
+  var volForm = $('#volForm');
+  var volMsg = $('#volMsg');
+  if (volForm) {
+    volForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var n = ($('#vName') && $('#vName').value || '').trim();
+      var p = ($('#vPhone') && $('#vPhone').value || '').trim().replace(/[\s-]/g, '');
+      if (!n || !p) {
+        if (volMsg) { volMsg.textContent = 'Please add your name and phone number.'; volMsg.className = 'form-msg err'; }
+        (n ? $('#vPhone') : $('#vName')).focus();
+        return;
+      }
+      if (!/^(?:\+?254|0)?[17]\d{8}$/.test(p)) {
+        if (volMsg) { volMsg.textContent = 'Please use a Kenyan number, e.g. 0712345678 or +254712345678.'; volMsg.className = 'form-msg err'; }
+        $('#vPhone').focus();
+        return;
+      }
+      var arr = sget(KEYS.volunteers) || [];
+      arr.push({
+        id: 'vol-' + Date.now(), ts: new Date().toISOString(), source: 'prototype',
+        name: n, phone: p,
+        location: ($('#vLoc') && $('#vLoc').value || '').trim(),
+        skills: ($('#vSkills') && $('#vSkills').value || '').trim(),
+        availability: ($('#vAvail') && $('#vAvail').value || '').trim(),
+        role: 'Volunteer signup'
+      });
+      sset(KEYS.volunteers, arr);
+      if (volMsg) {
+        volMsg.textContent = 'Karibu, ' + n.split(' ')[0] + "! Your volunteer application is saved. Amos Bett's team will call " + p + ' to welcome you aboard.';
+        volMsg.className = 'form-msg ok';
+      }
+      announce('Volunteer application saved on this device.');
+      volForm.reset();
+    });
+  }
+
+  /* ---------- Newsletter ---------- */
+  var nlForm = $('#nlForm');
+  var nl = $('#nl');
+  var nlMsg = $('#nlMsg');
+  if (nlForm) {
+    nlForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var v = (nl && nl.value || '').trim();
+      if (!/.+@.+\..+/.test(v)) {
+        if (nlMsg) { nlMsg.textContent = 'Please enter a valid email address.'; nlMsg.className = 'form-msg err'; }
+        if (nl) nl.focus();
+        return;
+      }
+      var arr = sget(KEYS.newsletter) || [];
+      if (arr.some(function (r) { return r.email === v.toLowerCase(); })) {
+        if (nlMsg) { nlMsg.textContent = 'You are already on the list — thank you!'; nlMsg.className = 'form-msg ok'; }
+        return;
+      }
+      arr.push({ id: 'news-' + Date.now(), ts: new Date().toISOString(), source: 'prototype', email: v.toLowerCase() });
+      sset(KEYS.newsletter, arr);
+      if (nlMsg) { nlMsg.textContent = "You're on the list. We write once a month, never more."; nlMsg.className = 'form-msg ok'; }
+      if (nl) nl.value = '';
+      announce('Newsletter subscription saved on this device.');
+    });
+  }
+
+  /* ---------- Contact form ---------- */
+  var cForm = $('#cForm');
+  var cMsg = $('#cMsg');
+  if (cForm) {
+    cForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var n = ($('#cName') && $('#cName').value || '').trim();
+      var m = ($('#cMsgIn') && $('#cMsgIn').value || '').trim();
+      if (!n || !m) {
+        if (cMsg) { cMsg.textContent = 'Please add your name and a message.'; cMsg.className = 'form-msg err'; }
+        (n ? $('#cMsgIn') : $('#cName')).focus();
+        return;
+      }
+      var arr = sget(KEYS.messages) || [];
+      arr.push({
+        id: 'msg-' + Date.now(), ts: new Date().toISOString(), source: 'prototype',
+        name: n, email: ($('#cEmail') && $('#cEmail').value || '').trim(), message: m
+      });
+      sset(KEYS.messages, arr);
+      if (cMsg) { cMsg.textContent = 'Message received! We reply within two working days — or reach us faster on WhatsApp.'; cMsg.className = 'form-msg ok'; }
+      announce('Message saved on this device.');
+      cForm.reset();
+    });
+  }
+
+  /* ---------- Copy buttons ---------- */
+  $$('[data-copy]').forEach(function (b) {
+    var orig = b.innerHTML;
+    b.addEventListener('click', function () {
+      var v = b.getAttribute('data-copy');
+      var flag = function () {
+        b.innerHTML = 'Copied ✓';
+        b.classList.add('copied');
+        announce('Copied to clipboard.');
+        window.setTimeout(function () { b.innerHTML = orig; b.classList.remove('copied'); }, 2000);
+      };
+      var fallback = function () {
+        try {
+          var ta = d.createElement('textarea');
+          ta.value = v;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          d.body.appendChild(ta);
+          ta.select();
+          var range = d.createRange();
+          range.selectNodeContents(ta);
+          var s = window.getSelection();
+          s.removeAllRanges();
+          s.addRange(range);
+          d.execCommand('copy');
+          d.body.removeChild(ta);
+          flag();
+        } catch (e) {
+          announce('Copy failed — long-press the value to copy instead.');
+        }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(v).then(flag, fallback);
+      } else {
+        fallback();
+      }
+    });
+  });
+
+  /* ---------- Data: export + clear ---------- */
+  var exportBtn = $('#exportData');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function () {
+      var dump = {
+        exportedAt: new Date().toISOString(),
+        source: 'prototype',
+        gifts: sget(KEYS.gifts) || [],
+        volunteers: sget(KEYS.volunteers) || [],
+        messages: sget(KEYS.messages) || [],
+        rsvps: sget(KEYS.rsvp) || [],
+        newsletter: sget(KEYS.newsletter) || []
+      };
+      var blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = d.createElement('a');
+      a.href = url;
+      a.download = 'heart2heart-prototype-records.json';
+      d.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+      announce('Your records were downloaded.');
+    });
+  }
+  var clearBtn = $('#clearData');
+  var clearArmed = false;
+  var clearTimer = null;
+  if (clearBtn) {
+    var origClear = clearBtn.innerHTML;
+    clearBtn.addEventListener('click', function () {
+      if (!clearArmed) {
+        clearArmed = true;
+        clearBtn.textContent = 'Tap again to erase everything';
+        clearTimer = window.setTimeout(function () {
+          clearArmed = false;
+          clearBtn.innerHTML = origClear;
+        }, 4000);
+        return;
+      }
+      window.clearTimeout(clearTimer);
+      Object.keys(KEYS).forEach(function (k) { sdel(KEYS[k]); });
+      clearArmed = false;
+      clearBtn.innerHTML = origClear;
+      refreshWall();
+      applyFilter();
+      setRsvpDone(false);
+      announce('All prototype records erased from this device.');
+    });
+  }
+
+  /* ---------- Back to top ---------- */
+  var toTop = $('#toTop');
+  if (toTop) {
+    window.addEventListener('scroll', function () {
+      toTop.classList.toggle('show', window.scrollY > 600);
+    }, { passive: true });
+    toTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+
+  /* ---------- Init ---------- */
+  if (!storageOk) {
+    var warn = $('#storageWarn');
+    if (warn) warn.hidden = false;
+  }
+  drawCal();
+  bindDays();
+  drawEv();
+  refreshWall();
+  sum();
+  /* A11Y-ADDONS */
+})();
+</script>
 </body>
 </html>
