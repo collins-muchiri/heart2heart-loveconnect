@@ -15,7 +15,7 @@ Heart 2 Heart & Love Connect Foundation is a community charity in Nakuru, Kenya,
 | --- | --- |
 | GitHub Pages | https://collins-muchiri.github.io/heart2heart-loveconnect/ |
 | Source repository | https://github.com/collins-muchiri/heart2heart-loveconnect |
-| Vercel mirror | deployed from this repository on the Hobby plan (see [Deployment](#deployment)) |
+| Vercel mirror | https://heart2heart-loveconnect.vercel.app/ |
 
 ## 60-second local run
 
@@ -112,7 +112,7 @@ We target **WCAG 2.2 AA**. Highlights: keyboard-first navigation with a skip lin
 
 - **GitHub Pages** deploys from `main` via GitHub Actions (`pages.yml`). The live URL is https://collins-muchiri.github.io/heart2heart-loveconnect/.
 - **Releases** are cut by pushing the annotated version tags created by `scripts/bump.mjs`; the release workflow publishes the matching GitHub release from the changelog.
-- **Vercel mirror.** The project is also deployed from this repository via Vercel on the Hobby plan. The mirror tracks the same branch; the GitHub Pages URL above remains the canonical address. A custom-domain decision is still open (see Open items).
+- **Vercel mirror.** The project is also deployed from this repository via Vercel on the Hobby plan at https://heart2heart-loveconnect.vercel.app/. The mirror tracks the same branch (`main`), so every push deploys both surfaces; the GitHub Pages URL above remains the canonical address. A custom-domain decision is still open (see Open items).
 
 ## Open items
 
