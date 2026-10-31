@@ -1,0 +1,57 @@
+name: Content update (foundation)
+description: Submit new or corrected copy and media on behalf of the foundation
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        THANK YOU for keeping the site accurate and respectful. This form is
+        for authorised foundation representatives. Every photo or video needs
+        confirmed written consent before it can be published.
+
+  - type: dropdown
+    id: section
+    attributes:
+      label: Which section?
+      description: The part of the site this update changes.
+      options:
+        - hero
+        - about
+        - programs
+        - stories
+        - events
+        - donate
+        - team
+        - contact
+        - footer
+    validations:
+      required: true
+
+  - type: textarea
+    id: new-copy
+    attributes:
+      label: New copy
+      description: Paste the full replacement text exactly as it should appear on the site.
+    validations:
+      required: true
+
+  - type: textarea
+    id: media-consent
+    attributes:
+      label: Media & consent
+      description: "List any new photos/videos, who they show, and whether written consent is held. Media without confirmed consent will be labelled `blocked:consent`."
+
+  - type: input
+    id: effective-date
+    attributes:
+      label: Effective date
+      description: "Optional — the date this content should go live (YYYY-MM-DD)."
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      description: Content submitted without this authorisation cannot be accepted.
+      options:
+        - label: I am authorised by the foundation to provide this content
+          required: true

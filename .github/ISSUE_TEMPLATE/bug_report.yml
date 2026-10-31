@@ -1,0 +1,81 @@
+name: Bug report
+description: Report a problem with the site — layout, forms, events, donations, or accessibility
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        THANK YOU for taking the time to report a bug. Clear, complete reports
+        get fixed faster, so please give us as much detail as you can.
+        If your question is urgent or relates to media consent, use the
+        WhatsApp contact link on the issue chooser instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A short, clear summary of the problem in one or two sentences.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Numbered steps starting from loading the page, for example:
+        1. Open the home page
+        2. Click "Donate"
+        3. See the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behaviour
+      description: What you expected to see or be able to do.
+
+  - type: textarea
+    id: actual-behaviour
+    attributes:
+      label: Actual behaviour
+      description: What happened instead, including anything unusual you noticed.
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: |
+        Attach screenshots in BOTH themes where possible — light theme AND
+        dark theme. You can drag images straight into this box.
+
+  - type: input
+    id: device-browser
+    attributes:
+      label: Device & browser
+      description: For example "Windows 11, Firefox 130" or "Android 14, Chrome 129".
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Console errors
+      description: |
+        Open your browser developer tools (F12), switch to the Console tab,
+        copy any red errors or warnings, and paste them here.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the site does this bug affect?
+      options:
+        - design/layout
+        - forms
+        - calendar/events
+        - donate portal
+        - stories filter
+        - accessibility
+        - other
+    validations:
+      required: true

@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest an improvement or new capability for the site
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        THANK YOU for helping the Heart 2 Heart & Love Connect Foundation
+        website grow. Start with the problem — a solution is much easier to
+        evaluate when the need behind it is clear.
+
+  - type: textarea
+    id: problem-to-solve
+    attributes:
+      label: Problem to solve
+      description: What can visitors, volunteers, or foundation staff not do today? Who is affected?
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: What you would like to happen, described as concretely as possible.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Other approaches you considered, including "keep things as they are".
+
+  - type: dropdown
+    id: affiliation
+    attributes:
+      label: Are you affiliated with the foundation?
+      description: This helps us weigh foundation-internal requests appropriately.
+      options:
+        - "Yes"
+        - "No"

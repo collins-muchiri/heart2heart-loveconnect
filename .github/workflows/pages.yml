@@ -1,0 +1,45 @@
+# Deploys the static site to GitHub Pages on every push to main.
+# The tag-release workflow (release.yml) redeploys Pages separately for full
+# release tags, so the live site always reflects the newest approved build.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - README.md
+
+# Only one Pages deployment at a time; a newer deploy supersedes a running one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  pages: write
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Publish site
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

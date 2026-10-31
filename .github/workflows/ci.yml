@@ -1,0 +1,85 @@
+# Continuous integration for the Heart 2 Heart & Love Connect Foundation site.
+#
+# The whole site is a single index.html plus static assets, so CI stays small:
+# validate the markup, check formatting (advisory only), run the Node smoke
+# tests, and verify that every in-page anchor resolves to a real id.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same branch or pull request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only token: CI never needs to write anything back to the repository.
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate site
+    runs-on: ubuntu-latest
+    # Safety cap; the expected runtime is well under two minutes.
+    timeout-minutes: 4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      # This repository has no package-lock.json and no node_modules: tools are
+      # invoked through `npx --yes`, so we cache npm's npx download cache
+      # instead of an install cache.
+      - name: Cache npx downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm/_npx
+          key: ${{ runner.os }}-npx-htmlvalidate-prettier-v1
+
+      - name: Validate HTML
+        run: npx --yes html-validate@9 index.html
+
+      # Formatting is enforced by `npx prettier --write` locally before you
+      # commit. In CI it is advisory only: formatting drift is surfaced as a
+      # workflow warning and must never fail the build.
+      - name: Check formatting (advisory)
+        run: |
+          if ! npx --yes prettier@3.4 --check index.html; then
+            echo "::warning::prettier --check found formatting drift in index.html. Run 'npx prettier@3.4 --write index.html' locally and commit the result. CI does not fail on formatting."
+          fi
+
+      - name: Run smoke tests
+        run: node scripts/smoke.test.mjs
+
+      # Every in-page anchor (href="#target") must point at an id that exists
+      # in index.html. Implemented inline so CI stays dependency-free.
+      - name: Internal link check
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+          const html = fs.readFileSync("index.html", "utf8");
+          const ids = new Set();
+          for (const m of html.matchAll(/\sid\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>=]+))/gi)) {
+            ids.add(m[1] ?? m[2] ?? m[3]);
+          }
+          const anchors = new Set();
+          for (const m of html.matchAll(/\shref\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
+            const value = m[1] ?? m[2];
+            if (value.startsWith("#") && value.length > 1) anchors.add(value.slice(1));
+          }
+          const missing = [...anchors].filter((id) => !ids.has(id));
+          if (missing.length > 0) {
+            console.error("Internal link check FAILED. Anchor targets with no matching id: " + missing.join(", "));
+            process.exit(1);
+          }
+          console.log("Internal link check passed: " + anchors.size + " unique in-page anchor target(s) all resolve to existing ids.");
+          NODE
