@@ -1,0 +1,25 @@
+{
+  "name": "heart2heart-loveconnect",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Single-file website prototype for Heart 2 Heart & Love Connect Foundation (Nakuru, Kenya) — no runtime dependencies, release-ready repository.",
+  "scripts": {
+    "test": "node scripts/smoke.test.mjs",
+    "release": "node scripts/bump.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/collins-muchiri/heart2heart-loveconnect.git"
+  },
+  "keywords": [
+    "charity",
+    "prototype",
+    "single-file",
+    "nakuru",
+    "kenya"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
