@@ -1,4 +1,4 @@
-# Heart 2 Heart & Love Connect Foundation — Website
+# Heart 2 Heart & Love Connect Foundation: Website
 
 [![CI](https://github.com/collins-muchiri/heart2heart-loveconnect/actions/workflows/ci.yml/badge.svg)](https://github.com/collins-muchiri/heart2heart-loveconnect/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/collins-muchiri/heart2heart-loveconnect/releases)
@@ -19,7 +19,7 @@ Heart 2 Heart & Love Connect Foundation is a community charity in Nakuru, Kenya,
 
 ## 60-second local run
 
-**Option A — tiny local server**
+**Option A: tiny local server**
 
 ```bash
 git clone https://github.com/collins-muchiri/heart2heart-loveconnect.git
@@ -29,7 +29,7 @@ python3 -m http.server 8000
 
 Then open <http://localhost:8000>.
 
-**Option B — no tools at all**
+**Option B: no tools at all**
 
 Double-click `index.html`. Because the site is a single self-contained file, everything works from `file://`: navigation, the theme toggle, forms, local persistence, the events calendar and the donation portal.
 
@@ -73,7 +73,7 @@ heart2heart-loveconnect/
 Everything an editor needs is in [`docs/content-model.md`](docs/content-model.md). Quick summary:
 
 - Most copy lives directly in `index.html`, section by section (`#home`, `#about`, `#programs`, `#volunteer`, `#blog`, `#events`, `#donate`, `#contact`).
-- Copy marked with a `sample` badge is provisional — replace it with verified figures and stories.
+- Copy marked with a `sample` badge is provisional: replace it with verified figures and stories.
 - Photos live in `assets/img/` at fixed filenames and are tracked in `assets/img/MANIFEST.md` (consent column).
 - Events are entries of the `EV` array; donation presets and the community goal are the `PRESETS` and `GOAL` constants; the phone number is the `PHONE` constant.
 - Bump the version when content changes (see below).
@@ -96,7 +96,7 @@ Release flow (maintainers):
 node scripts/bump.mjs patch   # or minor / major
 ```
 
-The script updates the version in all four places, runs the smoke test, writes the changelog entry, commits `chore(release): vX.Y.Z` and creates an annotated tag. It never pushes — push the commit and tag and let CI finish the release.
+The script updates the version in all four places, runs the smoke test, writes the changelog entry, commits `chore(release): vX.Y.Z` and creates an annotated tag. It never pushes: push the commit and tag and let CI finish the release.
 
 ## Accessibility
 
@@ -120,12 +120,12 @@ Owned by the foundation; each blocks `v1.0.0` unless noted:
 
 1. Real photos and media-release consent confirmations (see `assets/img/MANIFEST.md`).
 2. Charity registration number.
-3. Official email — the current `info@heart2heart-loveconnect.org` is a placeholder — plus verified Paybill, bank and PayPal details.
+3. Official email (the current `info@heart2heart-loveconnect.org` is a placeholder) plus verified Paybill, bank and PayPal details.
 4. Verified impact statistics to replace the sample counters.
 5. Event dates and venue confirmations for the 2026 calendar.
 6. Team roles confirmation.
 7. Custom domain decision.
-8. Analytics decision — currently none, by design.
+8. Analytics decision: currently none, by design.
 9. Real payment integration to replace the simulated rails.
 10. Safeguarding and privacy policy finalisation.
 
@@ -133,9 +133,9 @@ Owned by the foundation; each blocks `v1.0.0` unless noted:
 
 With gratitude to the partners who make the work possible:
 
-- **Rani Ramchandani Foundation** — mobility aids donated to the Kuresoi North drive.
-- **Rotary Club of Rehama Nairobi** — joint outreach at Moricho, Rongai.
-- **Hon. Leonard Bor** — facilitation of the mobility-aids donation.
+- **Rani Ramchandani Foundation**: mobility aids donated to the Kuresoi North drive.
+- **Rotary Club of Rehama Nairobi**: joint outreach at Moricho, Rongai.
+- **Hon. Leonard Bor**: facilitation of the mobility-aids donation.
 
 Founded and led by **Amos Bett**, together with the foundation's volunteers and the communities of Kuresoi North, Rongai and Nakuru town.
 
@@ -145,10 +145,10 @@ Released under the [MIT License](LICENSE). Copyright (c) 2026 Heart 2 Heart & Lo
 
 ## Verification (v0.1.0)
 
-Quality gates executed on this release — `node scripts/smoke.test.mjs` (21 checks):
+Quality gates executed on this release: `node scripts/smoke.test.mjs` (21 checks):
 
 ```text
-Heart 2 Heart & Love Connect — static smoke test (index.html)
+Heart 2 Heart & Love Connect: static smoke test (index.html)
   ok  a · package.json version ↔ <html data-app-version> (0.1.0)
   ok  b · package.json version ↔ build-stamp comment (v0.1.0)
   ok  c · package.json version ↔ footer <span data-version> (v0.1.0)
@@ -160,7 +160,7 @@ Heart 2 Heart & Love Connect — static smoke test (index.html)
   ok  i · referenced local assets exist on disk (6 asset(s))
   ok  j · no forbidden artifacts (TODO/lorem/[entity-/canonical_name/¦) (clean)
   ok  k · localStorage keys use the h2h.v1. namespace (all h2h. occurrences are namespaced)
-  ok  l · <title> present and ≤ 60 chars (59 chars — "Heart 2 Heart & Love Connect Foundation | Nakuru, Kenya")
+  ok  l · <title> present and ≤ 60 chars (59 chars: "Heart 2 Heart & Love Connect Foundation | Nakuru, Kenya")
   ok  m · meta description present and ≤ 155 chars (147 chars)
   ok  n · lang="en-KE" on <html> (en-KE)
   ok  o · JSON-LD organization block (@type NGO)
@@ -176,6 +176,6 @@ Heart 2 Heart & Love Connect — static smoke test (index.html)
 
 Additional gates: `npx --yes html-validate@9 index.html` → **0 errors**; artifact grep
 (`grep -nE "TODO|lorem|\[entity-|canonical_name" index.html`) → **no matches**; Prettier
-note — `prettier --check` flags formatting because Prettier's default void-element style
+note: `prettier --check` flags formatting because Prettier's default void-element style
 (`<meta/>`) contradicts html-validate's `void-style` rule; this repo keeps the
 html-validate-canonical style and treats the Prettier pass as advisory (see `ci.yml`).

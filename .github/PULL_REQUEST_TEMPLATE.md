@@ -31,7 +31,7 @@ REQUIRED for any change that affects what visitors see. Capture BOTH themes
 
 ## Accessibility notes
 
-Be specific — reviewers will spot-check what you report here.
+Be specific: reviewers will spot-check what you report here.
 
 - **Keyboard pass:** Tab through every changed screen. Confirm the focus order is logical, focus is always visible, and nothing traps keyboard focus.
 - **aria-live announcements:** If the change touches dynamic updates (stories filter, forms, calendar), describe what a screen reader announces when the state changes.
@@ -43,7 +43,7 @@ You confirm all of the following before requesting review:
 
 - [ ] `npx --yes html-validate@9 index.html` reports 0 errors
 - [ ] `node scripts/smoke.test.mjs` is green
-- [ ] Internal links pass — every `href="#..."` anchor in index.html resolves to an existing `id`
+- [ ] Internal links pass: every `href="#..."` anchor in index.html resolves to an existing `id`
 - [ ] No unfinished-work or filler-copy artifacts: `grep -rnEi "todo|lorem" index.html assets docs scripts` returns nothing
 - [ ] Console is clean (no errors or warnings) in both light and dark themes
 
@@ -51,9 +51,9 @@ You confirm all of the following before requesting review:
 
 Per the project semver policy:
 
-- **MAJOR** — structural, navigation, or stored-schema changes
-- **MINOR** — new section, programme, field, or i18n addition
-- **PATCH** — copy, accessibility, or image fixes
+- **MAJOR**: structural, navigation, or stored-schema changes
+- **MINOR**: new section, programme, field, or i18n addition
+- **PATCH**: copy, accessibility, or image fixes
 
 Recommended bump: patch / minor / major (keep one)
 

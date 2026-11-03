@@ -38,13 +38,13 @@ Community leaders are responsible for clarifying and enforcing our standards of 
 
 Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, documentation edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
 
-**How to report.** Contact the Heart 2 Heart & Love Connect Foundation leadership: email `info@heart2heart-loveconnect.org` (placeholder address, to be confirmed — if it does not respond, use WhatsApp) or WhatsApp +254723887935 (https://wa.me/254723887935). All complaints will be reviewed and investigated promptly and fairly.
+**How to report.** Contact the Heart 2 Heart & Love Connect Foundation leadership: email `info@heart2heart-loveconnect.org` (placeholder address, to be confirmed: if it does not respond, use WhatsApp) or WhatsApp +254723887935 (https://wa.me/254723887935). All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the reporter of any incident.
 
 ## Scope
 
-This Code of Conduct applies within all project spaces — the repository, issues, pull requests, and any channel representing the project — and it also applies when an individual is officially representing the project in public spaces.
+This Code of Conduct applies within all project spaces, the repository, issues, pull requests, and any channel representing the project, and it also applies when an individual is officially representing the project in public spaces.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior, and all dignity-clause concerns, may be reported to the foundation leadership through the contacts above. Leadership will review and investigate all complaints and will respond in a way that it deems appropriate to the circumstances. Leadership is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.
 

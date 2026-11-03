@@ -4,7 +4,7 @@
 
 | Version | Supported |
 | --- | --- |
-| 0.1.x | Yes — while the prototype disclaimer banner is live |
+| 0.1.x | Yes, while the prototype disclaimer banner is live |
 | < 0.1.0 | No |
 
 ## Reporting a vulnerability
@@ -13,11 +13,11 @@ Email `info@heart2heart-loveconnect.org` with the subject line `[security]`, or 
 
 Note: the email address above is the foundation's published placeholder address and is still to be confirmed; if the inbox does not respond, use WhatsApp. We aim to acknowledge every report **within 72 hours**.
 
-Please include: what you found, the steps to reproduce it, the URL(s) affected, and — if you have one — a suggested fix. Do not include other people's personal data in your report.
+Please include: what you found, the steps to reproduce it, the URL(s) affected, and (if you have one) a suggested fix. Do not include other people's personal data in your report.
 
 ## Scope
 
-This is a **static prototype**: no backend, no user accounts, no payment processing. All donation rails are simulated — nothing is charged and no payment details are collected.
+This is a **static prototype**: no backend, no user accounts, no payment processing. All donation rails are simulated: nothing is charged and no payment details are collected.
 
 **In scope:**
 
@@ -36,4 +36,4 @@ If you make a good-faith effort to comply with this policy during your research,
 
 ## Confidentiality and safeguarding
 
-We ask you to keep the details of any accepted report confidential until a fix is published. Independently of this policy: **any report that touches the safety or wellbeing of a beneficiary — a child, a girl in the mentorship programme, an elderly person or a person with disabilities — is escalated to the foundation leadership immediately**, ahead of any technical remediation.
+We ask you to keep the details of any accepted report confidential until a fix is published. Independently of this policy: **any report that touches the safety or wellbeing of a beneficiary: a child, a girl in the mentorship programme, an elderly person or a person with disabilities: is escalated to the foundation leadership immediately**, ahead of any technical remediation.

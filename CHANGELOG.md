@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 ## Index
 
 - [Unreleased](#unreleased)
-- [0.1.0 — 2026-10-31](#010---2026-10-31)
+- [0.1.0-2026-10-31](#010-2026-10-31)
 
 ## [Unreleased]
 
@@ -15,13 +15,13 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 - CI: the release workflow no longer redeploys Pages. Pages deploys from `main` via `pages.yml`, and release tags are always cut from `main` HEAD, so the redundant job only caused deployment races (and false release failures).
 
-## [0.1.1] - 2026-10-31
+## [0.1.1] (2026-10-31)
 
 ### Fixed
 
 - Replaced every em dash and spaced en dash across the page copy with natural punctuation (commas, colons and full stops), and switched calendar date ranges to plain "to" phrasing. No wording or meaning changed.
 
-## [0.1.0] - 2026-10-31
+## [0.1.0] (2026-10-31)
 
 First prototype release of the Heart 2 Heart & Love Connect Foundation website, cut as a pre-release while the on-site disclaimer banner is live.
 
